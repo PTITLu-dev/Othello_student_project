@@ -1,0 +1,10 @@
+# Binaires et objets
+*.o
+othelo
+test_othello
+userSimple
+userSimpleIA
+
+# Librairie réseau fournie par l'Esisar (non redistribuée) et archives
+*.so
+*.tar

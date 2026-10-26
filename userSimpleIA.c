@@ -65,10 +65,10 @@ int main(int argc,char *argv[])
 			// recuperation du coup sur stdin 
 			uint64_t coups_possibles = generer_coups_possibles(mes_pions, pions_adv);
 			if (coups_possibles == 0) {
-				printf("Aucun coup possibles. dommageee\n");
+				printf("Aucun coup possible : le joueur passe son tour.\n");
 				g->move=64;
 				if (passe_tour_precedent == 1) {
-					printf("Plus personne peux jouer, c'est triste\n");
+					printf("Plus aucun joueur ne peut jouer : fin de la partie.\n");
 					break;
 				}
 				passe_tour_precedent = 1;
@@ -79,7 +79,7 @@ int main(int argc,char *argv[])
             else{
                 passe_tour_precedent = 0;
 
-			printf("Voila ou lia peux jouer:\n");
+			printf("Coups possibles pour l'IA (*) :\n");
 			printf("  A B C D E F G H\n");
 			for (int i = 0; i < 64; i++) {
 				if (i % 8 == 0) printf("\n%d ", (i / 8) + 1);

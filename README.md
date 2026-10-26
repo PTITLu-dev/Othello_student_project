@@ -5,13 +5,13 @@
 ![AI](https://img.shields.io/badge/AI-Minimax-purple.svg)
 
 ## 📝 Description
-Ce projet est un moteur de jeu ultra-optimisé pour **Othello (Reversi)**, développé en langage C dans le cadre de mon cursus à l'Esisar. 
+Moteur de jeu **Othello (Reversi)** en C, développé en binôme dans le cadre d'un TP à l'Esisar (Grenoble INP). Notre IA a été confrontée à celles des autres binômes lors du tournoi de fin de TP.
 
-L'objectif principal était de concevoir une architecture très performante capable de faire tourner une Intelligence Artificielle avancée, tout en s'interfaçant avec un module de communication réseau TCP/IP (fourni par l'équipe pédagogique). Le moteur s'appuie sur la manipulation bas niveau (Bitboards) pour calculer les états de jeu instantanément.
+L'objectif était de concevoir un moteur rapide capable de faire tourner une IA de recherche, tout en s'interfaçant avec un module de communication réseau TCP/IP (fourni par l'équipe pédagogique). Le moteur s'appuie sur la manipulation bas niveau (Bitboards) pour calculer les états de jeu instantanément.
 
 ## ✨ Fonctionnalités techniques
-* **Optimisation par Bitboards :** L'état du plateau est représenté par des entiers de 64 bits (`uint64_t`), utilisant des masques (ex: `MUR_A`, `COIN_H1`) pour générer les coups possibles et les retournements de pions via des opérations binaires. Cela réduit drastiquement la complexité algorithmique.
-* **Intelligence Artificielle (Minimax) :** Le client `userSimpleIA.c` intègre un algorithme Minimax récursif (`minmax_complet`) explorant l'arbre des coups jusqu'à une profondeur de 6 (facilement extensible à 10+ grâce aux performances des bitboards).
+* **Optimisation par Bitboards :** L'état du plateau est représenté par des entiers de 64 bits (`uint64_t`), utilisant des masques (ex: `MUR_A`, `COIN_H1`) pour générer les coups possibles et les retournements de pions via des opérations binaires. Chaque génération de coups se fait en quelques opérations sur 64 bits, sans parcourir de tableau.
+* **Intelligence Artificielle (Minimax) :** Le client `userSimpleIA.c` intègre un algorithme Minimax récursif (`minmax_complet`) explorant l'arbre des coups jusqu'à une profondeur de 6, sans élagage (voir les axes d'amélioration).
 * **Heuristique stratégique :** La fonction `evaluer` analyse la qualité d'une position en ciblant en priorité la capture des coins et en maximisant la mobilité du bot par rapport à celle de l'adversaire.
 * **Architecture Modulaire & Réseau :** Séparation stricte entre le moteur mathématique (`fonctions.c`), le client autonome (`userSimpleIA.c`), le client humain (`userSimple.c`), et le *wrapper* réseau (`userNetwork.h`) permettant des duels inter-machines.
 * **Tests Unitaires :** Un pont adaptateur (`test_adaptateur.c`) permet de vérifier la fiabilité de la logique 64 bits contre un framework de test classique en tableau 2D
@@ -25,33 +25,37 @@ Ce développement m'a permis d'approfondir la gestion de la mémoire et l'optimi
 
 ## 🛠️ Compilation et Exécution
 
-**Prérequis :** `gcc` et un environnement Linux/Unix.
+**Prérequis :** `gcc` et `make` sous Linux/Unix.
 
 ```bash
-# Compiler le projet complet (Moteur, IA, Humain, Tests)
+# Jeu local en terminal (2 joueurs humains) + programme de test du moteur
 make
+./othelo
 
-# Lancer le client avec IA autonome
-./userSimpleIA <password> <ip_serveur> <user_id>
+# Clients réseau (IA et joueur humain) : nécessitent libothello.so,
+# la librairie réseau fournie par l'Esisar, non redistribuée dans ce dépôt.
+# Copiez-la à la racine du projet, puis :
+make reseau
+LD_LIBRARY_PATH=. ./userSimpleIA <password> <ip_serveur> <user_id>
+LD_LIBRARY_PATH=. ./userSimple   <password> <ip_serveur> <user_id>
 
-# Lancer le client pour joueur Humain
-./userSimple <password> <ip_serveur> <user_id>
+make clean
 ```
 
 ## 📂 Structure du code
-Moteur & IA (Développé par le binôme 11) :
 
-fonctions.c / fonctions.h : Logique Bitboards, génération des coups, algorithme Minimax
+**Moteur & IA** (développés par le binôme) :
+- `fonctions.c` / `fonctions.h` : bitboards, génération des coups, retournements, Minimax et heuristique
+- `main.c` : partie locale à deux joueurs dans le terminal
+- `userSimpleIA.c` : client réseau piloté par l'IA
+- `userSimple.c` : client réseau pour un joueur humain
 
-userSimpleIA.c : Boucle de jeu automatisée pour le bot
+**Tests** :
+- `test.c` : programme de test qui rejoue des coups sur une grille 2D (`./test_othello <fichier>`)
+- `test_adaptateur.c` : adaptateur entre le moteur 64 bits et ce programme de test
 
-userSimple.c : Interface CLI pour les commandes humaines
-
-test_adaptateur.c : Validations techniques
-
-Connectivité (Fourni par l'Esisar) :
-
-userNetwork.h / libothello : Intégration réseau et gestion des sockets
+**Fourni par l'Esisar** :
+- `userNetwork.h` (en-tête) et `libothello.so` (non incluse) : connexion au serveur de jeu
 
 ## 👥 Auteurs
 PETIT Lucas

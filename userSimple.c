@@ -65,10 +65,10 @@ int main(int argc,char *argv[])
 			// recuperation du coup sur stdin 
 			uint64_t coups_possibles = generer_coups_possibles(mes_pions, pions_adv);
 			if (coups_possibles == 0) {
-				printf("Aucun coup possibles. dommageee\n");
+				printf("Aucun coup possible : le joueur passe son tour.\n");
 				g->move=64;
 				if (passe_tour_precedent == 1) {
-					printf("Plus personne peux jouer, c'est triste\n");
+					printf("Plus aucun joueur ne peut jouer : fin de la partie.\n");
 					break;
 				}
 				passe_tour_precedent = 1;
@@ -77,7 +77,7 @@ int main(int argc,char *argv[])
 			}
 			passe_tour_precedent = 0;
 
-			printf("Voila ou tu peux jouer:\n");
+			printf("Coups possibles (*) :\n");
 			printf("  A B C D E F G H\n");
 			for (int i = 0; i < 64; i++) {
 				if (i % 8 == 0) printf("\n%d ", (i / 8) + 1);
@@ -93,18 +93,24 @@ int main(int argc,char *argv[])
 			while (!choix_valide) {
 				char col;
 				int ligne;
-				printf("Entrez votre coup (ex: C4(BOOOOOM)) : ");
+				printf("Entrez votre coup (ex : C4) : ");
 				char input[10];
-				if (scanf("%s", input) != 1 || !isalpha(input[0]) || !isdigit(input[1])) {
-					printf("reeasye j'ai pas compris ex: C4, kaboum\n");
-					while (getchar() != '\n');
+				int lu = scanf("%9s", input);
+				if (lu == EOF) {
+					printf("\nFin de l'entrée : partie interrompue.\n");
+					exit(0);
+				}
+				if (lu != 1 || !isalpha((unsigned char)input[0]) || !isdigit((unsigned char)input[1])) {
+					printf("Saisie invalide, réessayez (ex : C4).\n");
+					int c;
+					while ((c = getchar()) != '\n' && c != EOF);
 					continue;
 				}
 				col = toupper(input[0]); 
 				ligne = input[1] - '0'; 
 				
 				if (col < 'A' || col > 'H' || ligne < 1 || ligne > 8) {
-					printf("attention tu es hors du plateau!!!!.\n");
+					printf("Case hors du plateau.\n");
 					continue;
 				}
 				int index = (ligne - 1) * 8 + (col - 'A');
@@ -113,7 +119,7 @@ int main(int argc,char *argv[])
 					g->move=index;
 					choix_valide = 1;
 				} else {
-					printf(".... tu peux pas jouer ici .....\n");
+					printf("Coup interdit sur cette case.\n");
 				}
 			}
 			Plateau etat_apres_coup = jouer_coup(mes_pions, pions_adv, coup_joue_calque);
